@@ -1,0 +1,4 @@
+requests
+ccxt == 1.45.18
+tweepy
+python-dotenv
