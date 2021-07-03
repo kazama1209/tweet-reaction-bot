@@ -22,7 +22,7 @@ positive_words = [
 ]
 
 # 売り要因になりそうな単語（表記ゆれを考慮して複数指定）
-negativewords = [
+negative_words = [
     '売り',
     'sell'
 ]
@@ -75,7 +75,7 @@ while True:
                 close_time = now + datetime.timedelta(minutes = 5)
             
             elif any([target_coin_name in tweet.text.lower() for target_coin_name in target_coin_names]) \
-                and any([negativeword in tweet.text.lower() for negativeword in negativewords]):
+                and any([negative_word in tweet.text.lower() for negative_word in negative_words]):
                 
                 # 成り行き売り注文
                 order = bybit_api.create_order(symbol, 'market', 'sell', amount)
