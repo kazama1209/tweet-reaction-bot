@@ -59,7 +59,7 @@ while True:
             # ツイートを取得
             tweet = twitter_api.get_user_recent_tweet(screen_name)
 
-            # ツイートが直近（1分以内）のものかどうかを確認（Bot起動時、時間差のある過去ツイートに引っ張られないようにするため）
+            # ツイートが直近（1分以内）のものかどうかを確認（時間差のある過去ツイートに引っ張られないようにするため）
             if (now - (tweet.created_at + datetime.timedelta(hours = 9))) < datetime.timedelta(minutes = 1):
 
                 # ツイート内に対象の通貨名（条件1）＋買い要因or売り要因の単語（条件2）が含まれるかを確認（ex. ビットコイン 買い）
