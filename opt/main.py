@@ -58,37 +58,44 @@ while True:
         if entry_flag == False:
             # ツイートを取得
             tweet = twitter_api.get_user_recent_tweet(screen_name)
-            
-            # ツイート内に対象の通貨名（条件1）＋買い要因or売り要因の単語（条件2）が含まれるかを確認（ex. ビットコイン 買い）
-            # 条件1と条件2は必ずセットである必要があり、どちらか1つだけでは成立しない
-            if any([target_coin_name in tweet.text.lower() for target_coin_name in target_coin_names]) \
-                and any([positive_word in tweet.text.lower() for positive_word in positive_words]):
-                
-                # 成り行き買い注文
-                order = bybit_api.create_order(symbol, 'market', 'buy', amount)
-                print(f'Buy: {now}')
-                
-                # エントリーフラグをTrueに変更
-                entry_flag = True
 
-                # 決済予定時刻を設定（現在時刻から〇分後）※ minutesに指定する値は任意でOK
-                close_time = now + datetime.timedelta(minutes = 5)
-            
-            elif any([target_coin_name in tweet.text.lower() for target_coin_name in target_coin_names]) \
-                and any([negative_word in tweet.text.lower() for negative_word in negative_words]):
+            # ツイートが直近（1分以内）のものかどうかを確認（Bot起動時、時間差のある過去ツイートに引っ張られないようにするため）
+            if (now - (tweet.created_at + datetime.timedelta(hours = 9))) < datetime.timedelta(minutes = 1):
+
+                # ツイート内に対象の通貨名（条件1）＋買い要因or売り要因の単語（条件2）が含まれるかを確認（ex. ビットコイン 買い）
+                # 条件1と条件2は必ずセットである必要があり、どちらか1つだけでは成立しない
+                if any([target_coin_name in tweet.text.lower() for target_coin_name in target_coin_names]) \
+                    and any([positive_word in tweet.text.lower() for positive_word in positive_words]):
+                    
+                    # 成り行き買い注文
+                    order = bybit_api.create_order(symbol, 'market', 'buy', amount)
+                    print(f'Buy: {now}')
+                    
+                    # エントリーフラグをTrueに変更
+                    entry_flag = True
+
+                    # 決済予定時刻を設定（現在時刻から〇分後）※ minutesに指定する値は任意でOK
+                    close_time = now + datetime.timedelta(minutes = 5)
                 
-                # 成り行き売り注文
-                order = bybit_api.create_order(symbol, 'market', 'sell', amount)
-                print(f'Sell: {now}')
+                elif any([target_coin_name in tweet.text.lower() for target_coin_name in target_coin_names]) \
+                    and any([negative_word in tweet.text.lower() for negative_word in negative_words]):
+                    
+                    # 成り行き売り注文
+                    order = bybit_api.create_order(symbol, 'market', 'sell', amount)
+                    print(f'Sell: {now}')
 
-                # エントリーフラグをTrueに変更
-                entry_flag = True
+                    # エントリーフラグをTrueに変更
+                    entry_flag = True
 
-                # 決済予定時刻を設定（現在時刻から〇分後）※ minutesに指定する値は任意でOK
-                close_time = now + datetime.timedelta(minutes = 5)
-            
+                    # 決済予定時刻を設定（現在時刻から〇分後）※ minutesに指定する値は任意でOK
+                    close_time = now + datetime.timedelta(minutes = 5)
+                
+                else:
+                    # それらしい単語が含まれていなかった場合はパス
+                    pass
+           
             else:
-                # 無かった場合はパス
+                # 直近のものでなかった場合はパス
                 pass
 
         else:
